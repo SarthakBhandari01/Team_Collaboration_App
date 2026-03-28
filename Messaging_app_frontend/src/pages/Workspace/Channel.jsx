@@ -68,7 +68,7 @@ export const Channel = () => {
   }
   return (
     <div className="flex flex-col h-full">
-      <ChannelHeader name={channelDetails?.name} />
+      <ChannelHeader name={channelDetails?.name} channelId={channelId} />
       <div
         ref={messageContainerListRef}
         className="flex-5 overflow-y-auto p-5 gap-y-2"

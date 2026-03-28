@@ -19,9 +19,18 @@ const messageRepository = {
   getMessageDetails: async (messageId) => {
     const message = await Message.findById(messageId).populate(
       "senderId",
-      "username email avatar"
+      "username email avatar",
     );
     return message;
+  },
+  deleteManyByFilter: async (filter) => {
+    try {
+      const response = await Message.deleteMany(filter);
+      return response;
+    } catch (error) {
+      console.error("Error deleting messages by filter:", error);
+      throw error;
+    }
   },
 };
 
