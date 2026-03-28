@@ -62,12 +62,23 @@ export const WorkspaceInviteModal = ({
     if (!email.trim()) return;
 
     try {
-      await sendInviteEmailMutation(email);
-      toast({
-        title: "Invite sent!",
-        description: `Invitation email sent to ${email}`,
-        type: "success",
-      });
+      const response = await sendInviteEmailMutation(email);
+      const data = response?.data;
+      
+      if (data?.emailSent) {
+        toast({
+          title: "Invite sent!",
+          description: `Invitation email sent to ${email}`,
+          type: "success",
+        });
+      } else {
+        // Email service unavailable, show join code to share manually
+        toast({
+          title: "Email unavailable",
+          description: data?.message || `Share join code ${joinCode} with ${email} manually`,
+          type: "default",
+        });
+      }
       setEmail("");
     } catch (error) {
       toast({

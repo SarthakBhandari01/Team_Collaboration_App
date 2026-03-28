@@ -433,19 +433,37 @@ export const sendInviteEmailService = async (workspaceId, email, userId) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    // Try to send email, but don't fail if SMTP is blocked (e.g., on Render free tier)
+    let emailSent = false;
+    try {
+      await transporter.sendMail(mailOptions);
+      emailSent = true;
+    } catch (emailError) {
+      console.warn("Email sending failed (SMTP may be blocked):", emailError.message);
+      // Continue execution - don't throw error
+    }
 
     // Create notification for the inviter
     await createNotification(
       userId,
       workspaceId,
       "workspace_invite",
-      "Invite sent",
-      `Invitation sent to ${email} for ${workspace.name}`,
-      { email }
+      emailSent ? "Invite sent" : "Invite link generated",
+      emailSent 
+        ? `Invitation sent to ${email} for ${workspace.name}`
+        : `Invitation link generated for ${workspace.name}. Share the join code: ${workspace.joinCode}`,
+      { email, emailSent }
     );
 
-    return { success: true, email };
+    return { 
+      success: true, 
+      email, 
+      emailSent,
+      joinCode: workspace.joinCode,
+      message: emailSent 
+        ? `Invite email sent to ${email}` 
+        : `Email service unavailable. Share join code ${workspace.joinCode} manually with ${email}`
+    };
   } catch (error) {
     console.log("Send invite email service error:", error);
     throw error;
