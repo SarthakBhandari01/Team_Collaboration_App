@@ -72,7 +72,7 @@ export const Editor = ({ onSubmit }) => {
             <Button
               variant="ghost"
               size="iconSm"
-              disable={false}
+              disabled={false}
               onClick={toggleToolbar}
             >
               <PiTextAa className="size-4" />
@@ -82,7 +82,7 @@ export const Editor = ({ onSubmit }) => {
             <Button
               variant="ghost"
               size="iconSm"
-              disable={false}
+              disabled={false}
               onClick={() => {}}
             >
               <ImageIcon className="size-4"></ImageIcon>
@@ -100,7 +100,7 @@ export const Editor = ({ onSubmit }) => {
                 });
                 quillRef.current?.setText("");
               }}
-              disable={false}
+              disabled={false}
               className="ml-auto bg-[#007a6a] hover:bg-[#007a6a]/80 text-white"
             >
               <MdSend className="size-4" />
