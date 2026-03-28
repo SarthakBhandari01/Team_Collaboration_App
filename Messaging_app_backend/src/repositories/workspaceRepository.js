@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 
-import Workspace from "../schema/workspace.js";
+import Workspace from "../schema/workSpace.js";
 import { isUserMemberOfWorkspace } from "../services/workspaceService.js";
 import ClientError from "../utils/errors/clientError.js";
 import channelRepository from "./channelRepository.js";
