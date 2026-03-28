@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import { SigninContainer } from "@/components/organisms/auth/SigninContainer";
 import { SignupContainer } from "@/components/organisms/auth/SignupContainer";
@@ -17,6 +17,7 @@ import { WorkspaceIndex } from "./pages/Workspace/WorkspaceIndex";
 export const AppRoutes = () => {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/home" replace />} />
       <Route
         path="/auth/signup"
         element={
