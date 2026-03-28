@@ -11,6 +11,7 @@ import { Message } from "@/components/molecules/Messages/Message";
 import { MessageListSkeleton } from "@/components/molecules/Skeletons/Skeletons";
 import { useGetChannelById } from "@/hooks/apis/channels/useGetChannelById";
 import { useGetChannelMessages } from "@/hooks/apis/channels/useGetChannelMessages";
+import { useDeleteMessage } from "@/hooks/apis/messages/useDeleteMessage";
 import { useChannelMessages } from "@/hooks/context/useChannelMessages";
 import { useSocket } from "@/hooks/context/useSocket";
 import {
@@ -25,6 +26,7 @@ export const Channel = () => {
   const { joinChannel } = useSocket();
   const { messageList, setMessageList } = useChannelMessages();
   const { isSuccess, messages } = useGetChannelMessages(channelId);
+  const { deleteMessageMutation } = useDeleteMessage();
   const queryClient = useQueryClient();
   const messageContainerListRef = useRef(null);
   const hasJoinedRef = useRef(null);
@@ -77,6 +79,12 @@ export const Channel = () => {
       </div>
     );
   }
+
+  async function handleDeleteMessage(messageId) {
+    await deleteMessageMutation(messageId);
+    setMessageList((prev) => prev.filter((msg) => msg._id !== messageId));
+  }
+
   // Group messages by date for dividers
   const groupedMessages = messageList?.reduce((groups, message) => {
     const dateKey = getDateKey(message.createdAt);
@@ -103,10 +111,13 @@ export const Channel = () => {
               {messages.map((message) => (
                 <Message
                   key={message._id}
+                  messageId={message._id}
+                  authorId={message.senderId?._id}
                   body={message.body}
                   authorImage={message.senderId?.avatar}
                   authorName={message.senderId?.username}
                   createdAt={formatRelativeTime(message.createdAt)}
+                  onDelete={handleDeleteMessage}
                 />
               ))}
             </div>

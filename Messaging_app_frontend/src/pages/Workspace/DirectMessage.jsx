@@ -11,6 +11,7 @@ import { Message } from "@/components/molecules/Messages/Message";
 import { MessageListSkeleton } from "@/components/molecules/Skeletons/Skeletons";
 import { useGetConversationById } from "@/hooks/apis/conversations/useGetConversationById";
 import { useGetConversationMessages } from "@/hooks/apis/conversations/useGetConversationMessages";
+import { useDeleteDMMessage } from "@/hooks/apis/messages/useDeleteDMMessage";
 import { useAuth } from "@/hooks/context/useAuth";
 import { useConversationMessages } from "@/hooks/context/useConversationMessages";
 import { useSocket } from "@/hooks/context/useSocket";
@@ -29,6 +30,7 @@ export const DirectMessage = () => {
   const { conversationMessageList, setConversationMessageList } =
     useConversationMessages();
   const { messages } = useGetConversationMessages(conversationId);
+  const { deleteDMMessageMutation } = useDeleteDMMessage();
   const queryClient = useQueryClient();
   const messageContainerListRef = useRef(null);
   const hasJoinedRef = useRef(null);
@@ -101,6 +103,13 @@ export const DirectMessage = () => {
     return groups;
   }, {});
 
+  async function handleDeleteMessage(messageId) {
+    await deleteDMMessageMutation(messageId);
+    setConversationMessageList((prev) =>
+      prev.filter((msg) => msg._id !== messageId),
+    );
+  }
+
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header with other member's name */}
@@ -134,10 +143,13 @@ export const DirectMessage = () => {
               {messages.map((message) => (
                 <Message
                   key={message._id}
+                  messageId={message._id}
+                  authorId={message.senderId?._id}
                   body={message.body}
                   authorImage={message.senderId?.avatar}
                   authorName={message.senderId?.username}
                   createdAt={formatRelativeTime(message.createdAt)}
+                  onDelete={handleDeleteMessage}
                 />
               ))}
             </div>

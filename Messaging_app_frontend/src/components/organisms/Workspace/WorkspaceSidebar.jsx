@@ -48,6 +48,11 @@ export const WorkspaceSidebar = () => {
         label={"DMs"}
         onClick={handleMessage}
       />
+      <SidebarButton
+        Icon={BellIcon}
+        label={"Notifications"}
+        onClick={() => navigate(`/workspaces/${workspaceId}/notifications`)}
+      />
       <div className="flex flex-col items-center justify-center mt-auto mb-5 gap-y-1">
         <UserButton />
       </div>

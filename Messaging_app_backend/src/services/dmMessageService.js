@@ -75,3 +75,31 @@ export const getConversationMessagesService = async (
     throw error;
   }
 };
+
+export const deleteDMMessageService = async (messageId, userId) => {
+  try {
+    const message = await dmMessageRepository.getById(messageId);
+    if (!message) {
+      throw new ClientError({
+        message: "Message not found",
+        explanation: "The message does not exist",
+        statusCode: StatusCodes.NOT_FOUND,
+      });
+    }
+
+    // Only the sender can delete their own message
+    if (message.senderId.toString() !== userId.toString()) {
+      throw new ClientError({
+        message: "Unauthorized to delete this message",
+        explanation: "You can only delete your own messages",
+        statusCode: StatusCodes.FORBIDDEN,
+      });
+    }
+
+    await dmMessageRepository.delete(messageId);
+    return { messageId, conversationId: message.conversationId };
+  } catch (error) {
+    console.log("Delete DM message service error", error);
+    throw error;
+  }
+};

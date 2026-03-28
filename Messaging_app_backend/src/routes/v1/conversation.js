@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+  deleteDMMessage,
   getUserConversations,
   createOrGetConversation,
   getConversationMessages,
@@ -18,5 +19,6 @@ router.get(
   isAuthenticated,
   getConversationMessages,
 );
+router.delete("/messages/:messageId", isAuthenticated, deleteDMMessage);
 
 export default router;

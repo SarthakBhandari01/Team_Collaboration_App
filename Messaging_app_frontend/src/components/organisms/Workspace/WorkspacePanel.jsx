@@ -69,19 +69,6 @@ export const WorkspacePanel = () => {
     <div className="flex flex-col h-full overflow-y-auto dark-scrollbar">
       <WorkspacePannelHeader workspace={workspace} />
       <div className="flex flex-col px-2 mt-3">
-        <SideBarItem
-          label={"Thread"}
-          channelId={"thread"}
-          variant="default"
-          icon={MessageSquareTextIcon}
-        />
-        <SideBarItem
-          label="Draft and Sends"
-          icon={SendHorizonalIcon}
-          channelId="drafts"
-          variant="default"
-        />
-
         <WorkspacePanelSection
           label={"Channels"}
           onIconClick={() => {

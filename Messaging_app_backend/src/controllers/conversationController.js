@@ -5,7 +5,10 @@ import {
   getUserConversationsService,
   getConversationByIdService,
 } from "../services/conversationService.js";
-import { getConversationMessagesService } from "../services/dmMessageService.js";
+import {
+  deleteDMMessageService,
+  getConversationMessagesService,
+} from "../services/dmMessageService.js";
 import {
   customErrorResponse,
   internalErrorResponse,
@@ -120,6 +123,26 @@ export const getConversationById = async (req, res) => {
       .json(successResponse(conversation, "Conversation fetched successfully"));
   } catch (error) {
     console.log("Get conversation by ID controller error", error);
+    if (error.statusCode) {
+      return res.status(error.statusCode).json(customErrorResponse(error));
+    }
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(internalErrorResponse(error));
+  }
+};
+
+export const deleteDMMessage = async (req, res) => {
+  try {
+    const response = await deleteDMMessageService(
+      req.params.messageId,
+      req.user,
+    );
+    return res
+      .status(StatusCodes.OK)
+      .json(successResponse(response, "Message deleted successfully"));
+  } catch (error) {
+    console.log("Delete DM message controller error", error);
     if (error.statusCode) {
       return res.status(error.statusCode).json(customErrorResponse(error));
     }
