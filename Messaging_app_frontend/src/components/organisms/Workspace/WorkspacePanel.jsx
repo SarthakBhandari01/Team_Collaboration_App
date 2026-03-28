@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { SideBarItem } from "@/components/atoms/SideBarItem/SideBarItem";
-import { UserItem } from "@/components/atoms/UserItem/userItem";
+import { UserItem } from "@/components/atoms/UserItem/UserItem";
 import { SidebarSkeleton } from "@/components/molecules/Skeletons/Skeletons";
 import { WorkspacePannelHeader } from "@/components/molecules/Workspace/WorkspacePanelHeader";
 import { WorkspacePanelSection } from "@/components/molecules/Workspace/WorkspacePanelSection";
