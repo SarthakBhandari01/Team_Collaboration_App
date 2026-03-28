@@ -11,9 +11,10 @@ export const useGetChannelMessages = (channelId) => {
         channelId,
         token: auth?.token,
         page: 1,
-        limit: 10,
+        limit: 50,
       }),
-    queryKey: ["getPaginatedMessages"],
+    queryKey: [`getPaginatedMessages-${channelId}`],
+    enabled: !!channelId && !!auth?.token,
   });
   return {
     isFetched,

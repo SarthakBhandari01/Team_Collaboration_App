@@ -1,18 +1,13 @@
-import {
-  AlertTriangleIcon,
-  HashIcon,
-  MessageSquareTextIcon,
-  SendHorizonalIcon,
-} from "lucide-react";
+import { AlertTriangleIcon, HashIcon } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { SideBarItem } from "@/components/atoms/SideBarItem/SideBarItem";
 import { UserItem } from "@/components/atoms/UserItem/userItem";
-import { WorkspaceInviteModal } from "@/components/organisms/Modals/WorkspaceInviteModal";
 import { SidebarSkeleton } from "@/components/molecules/Skeletons/Skeletons";
 import { WorkspacePannelHeader } from "@/components/molecules/Workspace/WorkspacePanelHeader";
 import { WorkspacePanelSection } from "@/components/molecules/Workspace/WorkspacePanelSection";
+import { WorkspaceInviteModal } from "@/components/organisms/Modals/WorkspaceInviteModal";
 import { useCreateConversation } from "@/hooks/apis/conversations/useCreateConversation";
 import { useGetConversations } from "@/hooks/apis/conversations/useGetConversations";
 import { useGetWorkspaceById } from "@/hooks/apis/workspaces/useGetWorkspaceById";

@@ -1,8 +1,7 @@
 import "quill/dist/quill.snow.css";
 
-import { ImageIcon } from "lucide-react";
 import Quill from "quill";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MdSend } from "react-icons/md";
 import { PiTextAa } from "react-icons/pi";
 
@@ -13,8 +12,18 @@ import { Hint } from "../Hint/Hint";
 export const Editor = ({ onSubmit }) => {
   const containerRef = useRef();
   const quillRef = useRef();
-  const defaultValueRef = useRef();
   const [isToolbarVisible, setIsToolbarVisible] = useState(true);
+  const [isEmpty, setIsEmpty] = useState(true);
+
+  const handleSubmit = useCallback(() => {
+    const text = quillRef.current?.getText()?.trim();
+    if (!text) return;
+
+    const messageContent = JSON.stringify(quillRef.current?.getContents());
+    onSubmit({ body: messageContent });
+    quillRef.current?.setText("");
+    setIsEmpty(true);
+  }, [onSubmit]);
 
   function toggleToolbar() {
     setIsToolbarVisible(!isToolbarVisible);
@@ -24,7 +33,7 @@ export const Editor = ({ onSubmit }) => {
     }
   }
   useEffect(() => {
-    if (!containerRef) return;
+    if (!containerRef.current) return;
     const container = containerRef.current;
     const editorContainer = container.appendChild(
       container.ownerDocument.createElement("div"),
@@ -34,7 +43,6 @@ export const Editor = ({ onSubmit }) => {
       modules: {
         toolbar: [
           ["bold", "italic", "underline", "strike"],
-          ["link"],
           [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
           ["clean"],
         ],
@@ -43,14 +51,20 @@ export const Editor = ({ onSubmit }) => {
             enter: {
               key: "Enter",
               handler: () => {
-                return;
+                const text = quillRef.current?.getText()?.trim();
+                if (text) {
+                  handleSubmit();
+                }
               },
             },
             shift_enter: {
               key: "Enter",
               shiftKey: true,
               handler: () => {
-                quill.insertText(quill.getSelection()?.index || 0, "\n");
+                quillRef.current?.insertText(
+                  quillRef.current?.getSelection()?.index || 0,
+                  "\n",
+                );
               },
             },
           },
@@ -60,8 +74,19 @@ export const Editor = ({ onSubmit }) => {
     const quill = new Quill(editorContainer, option);
     quillRef.current = quill;
     quillRef.current.focus();
-    quill.setContents(defaultValueRef.current);
-  }, []);
+
+    // Track empty state
+    quill.on("text-change", () => {
+      const text = quill.getText()?.trim();
+      setIsEmpty(!text);
+    });
+
+    // Cleanup on unmount
+    return () => {
+      quillRef.current = null;
+      container.innerHTML = "";
+    };
+  }, [handleSubmit]);
 
   return (
     <div className="flex flex-col">
@@ -78,30 +103,12 @@ export const Editor = ({ onSubmit }) => {
               <PiTextAa className="size-4" />
             </Button>
           </Hint>
-          <Hint label={"Image"}>
-            <Button
-              variant="ghost"
-              size="iconSm"
-              disabled={false}
-              onClick={() => {}}
-            >
-              <ImageIcon className="size-4"></ImageIcon>
-            </Button>
-          </Hint>
           <Hint label={"Send Message"}>
             <Button
               size="iconSm"
-              onClick={() => {
-                const messageContent = JSON.stringify(
-                  quillRef.current?.getContents(),
-                );
-                onSubmit({
-                  body: messageContent,
-                });
-                quillRef.current?.setText("");
-              }}
-              disabled={false}
-              className="ml-auto bg-[#007a6a] hover:bg-[#007a6a]/80 text-white"
+              onClick={handleSubmit}
+              disabled={isEmpty}
+              className="ml-auto bg-[#007a6a] hover:bg-[#007a6a]/80 text-white disabled:opacity-50"
             >
               <MdSend className="size-4" />
             </Button>
@@ -109,7 +116,8 @@ export const Editor = ({ onSubmit }) => {
         </div>
       </div>
       <p className="p-2 text-[10px] text-muted-foreground flex justify-end">
-        <strong>Shift + return</strong> &nbsp; to add a new line
+        <strong>Enter</strong> &nbsp; to send, &nbsp;
+        <strong>Shift + Enter</strong> &nbsp; for new line
       </p>
     </div>
   );

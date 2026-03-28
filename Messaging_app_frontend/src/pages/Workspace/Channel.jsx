@@ -49,9 +49,11 @@ export const Channel = () => {
   }, [messageList]);
 
   useEffect(() => {
-    queryClient.invalidateQueries("getPaginatedMessages");
+    // Clear messages when channel changes
+    setMessageList([]);
+    queryClient.invalidateQueries(`getPaginatedMessages-${channelId}`);
     hasJoinedRef.current = null;
-  }, [channelId, queryClient]);
+  }, [channelId, queryClient, setMessageList]);
 
   useEffect(() => {
     if (
@@ -66,10 +68,10 @@ export const Channel = () => {
   }, [channelId, isFetching, isError, joinChannel]);
 
   useEffect(() => {
-    if (isSuccess && messages) {
+    if (isSuccess && messages && messages.length > 0) {
       setMessageList(messages);
     }
-  }, [isSuccess, messages]);
+  }, [isSuccess, messages, setMessageList]);
 
   if (isFetching) {
     return (
@@ -107,7 +109,11 @@ export const Channel = () => {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <ChannelHeader name={channelDetails?.name} channelId={channelId} isAdmin={isAdmin} />
+      <ChannelHeader
+        name={channelDetails?.name}
+        channelId={channelId}
+        isAdmin={isAdmin}
+      />
       <div
         ref={messageContainerListRef}
         className="flex-1 overflow-y-auto messages-scrollbar"
@@ -134,7 +140,7 @@ export const Channel = () => {
           ))
         )}
       </div>
-      <ChatInput />
+      <ChatInput channelId={channelId} />
     </div>
   );
 };

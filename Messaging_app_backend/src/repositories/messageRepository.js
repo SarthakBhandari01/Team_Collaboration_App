@@ -10,7 +10,7 @@ const messageRepository = {
         .skip((page - 1) * limit)
         .limit(limit)
         .populate("senderId", "username email avatar");
-      return messages;
+      return messages.reverse(); // Return in chronological order (oldest first)
     } catch (error) {
       console.error("Error fetching paginated messages:", error);
       throw error;

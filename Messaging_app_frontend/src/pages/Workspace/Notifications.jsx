@@ -6,7 +6,7 @@ import {
   MailIcon,
   UserPlusIcon,
 } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { useGetNotifications } from "@/hooks/apis/notifications/useGetNotifications";
@@ -45,7 +45,6 @@ const formatRelativeTime = (dateString) => {
 };
 
 export const Notifications = () => {
-  const { workspaceId } = useParams();
   const navigate = useNavigate();
   const { notifications, isLoading, refetch } = useGetNotifications();
   const { markReadMutation } = useMarkNotificationRead();

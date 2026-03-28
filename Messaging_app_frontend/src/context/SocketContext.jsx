@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useRef } from "react";
+import { createContext, useEffect, useRef,useState } from "react";
 import { io } from "socket.io-client";
 
 import { useChannelMessages } from "@/hooks/context/useChannelMessages";
@@ -10,9 +10,8 @@ export const SocketContextProvider = ({ children }) => {
   const socketRef = useRef(null);
   const [currentChannel, setCurrentChannel] = useState(null);
   const [currentConversation, setCurrentConversation] = useState(null);
-  const { messageList, setMessageList } = useChannelMessages();
-  const { conversationMessageList, setConversationMessageList } =
-    useConversationMessages();
+  const { setMessageList } = useChannelMessages();
+  const { setConversationMessageList } = useConversationMessages();
 
   useEffect(() => {
     // Create socket only once

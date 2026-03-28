@@ -40,7 +40,7 @@ export const WorkspacePannelHeader = ({ workspace }) => {
       />
       <div className="h-50px flex items-center justify-between px-4 gap-0.5">
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>
             <Button
               variant="transparent"
               className="font-semibold text-lg w-auto p-1.5 overflow-hidden"

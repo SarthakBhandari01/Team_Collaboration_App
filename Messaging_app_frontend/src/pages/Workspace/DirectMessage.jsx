@@ -3,12 +3,12 @@ import { TriangleAlertIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChatInput } from "@/components/molecules/ChatInput/ChatInput";
 import { DateDivider } from "@/components/molecules/Messages/DateDivider";
 import { DMEmptyState } from "@/components/molecules/Messages/EmptyStates";
 import { Message } from "@/components/molecules/Messages/Message";
 import { MessageListSkeleton } from "@/components/molecules/Skeletons/Skeletons";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useGetConversationById } from "@/hooks/apis/conversations/useGetConversationById";
 import { useGetConversationMessages } from "@/hooks/apis/conversations/useGetConversationMessages";
 import { useDeleteDMMessage } from "@/hooks/apis/messages/useDeleteDMMessage";
@@ -68,7 +68,7 @@ export const DirectMessage = () => {
     if (messages) {
       setConversationMessageList(messages);
     }
-  }, [messages]);
+  }, [messages, setConversationMessageList]);
 
   if (isFetching) {
     return (

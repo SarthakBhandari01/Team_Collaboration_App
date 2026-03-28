@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/context/useAuth";
 import { useCurrentWorkspace } from "@/hooks/context/useCurrentWorkspace";
 import { useSocket } from "@/hooks/context/useSocket";
 
-export const ChatInput = ({ type = "channel", conversationId }) => {
+export const ChatInput = ({ type = "channel", conversationId, channelId }) => {
   const { socket, currentChannel, currentConversation } = useSocket();
   const { auth } = useAuth();
   const { currentWorkspace } = useCurrentWorkspace();
@@ -28,7 +28,7 @@ export const ChatInput = ({ type = "channel", conversationId }) => {
       socket.emit(
         "NewMessage",
         {
-          channelId: currentChannel,
+          channelId: channelId || currentChannel,
           body,
           senderId: auth?.user?._id,
           workspaceId: currentWorkspace?._id,
