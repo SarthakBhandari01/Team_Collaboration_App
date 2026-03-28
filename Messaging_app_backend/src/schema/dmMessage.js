@@ -31,6 +31,9 @@ const dmMessageSchema = new mongoose.Schema(
 // Index for fast retrieval of messages by conversation
 dmMessageSchema.index({ conversationId: 1, createdAt: -1 });
 
+// Text index for full-text search on message body
+dmMessageSchema.index({ body: "text" });
+
 const DMMessage = mongoose.model("DMMessage", dmMessageSchema);
 
 export default DMMessage;

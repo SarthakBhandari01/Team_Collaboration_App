@@ -28,6 +28,9 @@ const messageSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// Text index for full-text search on message body
+messageSchema.index({ body: "text" });
+
 const Message = mongoose.model("Message", messageSchema);
 
 export default Message;
