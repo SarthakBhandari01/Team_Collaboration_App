@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 
 import { useChannelMessages } from "@/hooks/context/useChannelMessages";
@@ -6,23 +6,37 @@ import { useChannelMessages } from "@/hooks/context/useChannelMessages";
 const SocketContext = createContext();
 
 export const SocketContextProvider = ({ children }) => {
-  const socket = io(import.meta.env.VITE_API_URL);
+  const socketRef = useRef(null);
   const [currentChannel, setCurrentChannel] = useState(null);
   const { messageList, setMessageList } = useChannelMessages();
 
-  socket.on("NewMessageReceived", (data) => {
-    console.log("new message received ", data);
-    setMessageList([...messageList, data]);
-  });
+  useEffect(() => {
+    // Create socket only once
+    socketRef.current = io(import.meta.env.VITE_API_URL);
+
+    // Listen for new messages
+    socketRef.current.on("NewMessageReceived", (data) => {
+      console.log("new message received ", data);
+      setMessageList((prev) => [...prev, data]);
+    });
+
+    // Cleanup on unmount
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, [setMessageList]);
+
   async function joinChannel(channelId) {
-    socket.emit("JoinChannel", { channelId }, (data) => {
+    socketRef.current.emit("JoinChannel", { channelId }, (data) => {
       console.log("Successfully joined channel", data);
       setCurrentChannel(data?.data);
     });
   }
 
   return (
-    <SocketContext.Provider value={{ socket, joinChannel, currentChannel }}>
+    <SocketContext.Provider
+      value={{ socket: socketRef.current, joinChannel, currentChannel }}
+    >
       {children}
     </SocketContext.Provider>
   );

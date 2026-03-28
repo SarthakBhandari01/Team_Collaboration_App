@@ -16,9 +16,9 @@ export const WorkspacePanelSection = ({ children, label, onIconClick }) => {
           className="size-6 text-sm p-0.5 text-[#f9edffcc]"
         >
           {open ? (
-            <FaCaretRight className="size-4" />
-          ) : (
             <FaCaretDown className="size-4" />
+          ) : (
+            <FaCaretRight className="size-4" />
           )}
         </Button>
         <Button
@@ -30,7 +30,7 @@ export const WorkspacePanelSection = ({ children, label, onIconClick }) => {
         </Button>
         {onIconClick && (
           <Button
-          onClick={onIconClick}
+            onClick={onIconClick}
             variant="primary"
             size="sm"
             className="text-[#f9edffcc] ml-auto  p-0.5  hover:bg-slack-dark transaction opacity"

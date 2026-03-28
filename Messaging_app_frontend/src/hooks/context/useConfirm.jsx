@@ -20,6 +20,7 @@ export const useConfirm = ({ title, message }) => {
   }
 
   function handleClose() {
+    promise?.resolve(false);
     setPromise(null);
   }
 

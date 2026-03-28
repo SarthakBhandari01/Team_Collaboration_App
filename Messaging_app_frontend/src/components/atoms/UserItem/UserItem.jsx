@@ -26,7 +26,7 @@ export const UserItem = ({ variant = "default", id, image, label }) => {
       className={cn(userItemVariants({ variant }))}
       asChild
     >
-      <Link to={`workspace/${workspace?._id}/members/${id}`}>
+    <Link to={`/workspaces/${workspace?._id}/members/${id}`}>
         <Avatar>
           <AvatarImage src={image} className="rounded-md " />
           <AvatarFallback className="rounded-md bg-sky-500 text-white">

@@ -18,7 +18,7 @@ export const ChatInput = () => {
       },
       (data) => {
         console.log("Message sent ", data);
-      }
+      },
     );
   }
 
