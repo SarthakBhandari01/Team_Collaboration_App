@@ -11,6 +11,7 @@ import { Channel } from "./pages/Workspace/Channel";
 import { DirectMessage } from "./pages/Workspace/DirectMessage";
 import { JoinPage } from "./pages/Workspace/joinPage";
 import { WorkspaceLayout } from "./pages/Workspace/Layout";
+import { WorkspaceIndex } from "./pages/Workspace/WorkspaceIndex";
 
 export const AppRoutes = () => {
   return (
@@ -43,7 +44,9 @@ export const AppRoutes = () => {
         path="/workspaces/:workspaceId"
         element={
           <ProtectedRoute>
-            <WorkspaceLayout>Workspace</WorkspaceLayout>
+            <WorkspaceLayout>
+              <WorkspaceIndex />
+            </WorkspaceLayout>
           </ProtectedRoute>
         }
       />

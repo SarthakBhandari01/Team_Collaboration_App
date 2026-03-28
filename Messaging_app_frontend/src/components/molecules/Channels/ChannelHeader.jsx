@@ -172,16 +172,18 @@ export const ChannelHeader = ({ name, channelId }) => {
                   </form>
                 </DialogContent>
               </Dialog>
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="flex items-center gap-x-2 px-5 py-4 bg-white rounded-lg cursor-pointer border hover:bg-gray-100 text-rose-600"
-              >
-                <TrashIcon className="size-4" />
-                <p className="text-sm font-semibold">
-                  {isDeleting ? "Deleting..." : "Delete Channel"}
-                </p>
-              </button>
+              {name !== "general" && (
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="flex items-center gap-x-2 px-5 py-4 bg-white rounded-lg cursor-pointer border hover:bg-gray-100 text-rose-600"
+                >
+                  <TrashIcon className="size-4" />
+                  <p className="text-sm font-semibold">
+                    {isDeleting ? "Deleting..." : "Delete Channel"}
+                  </p>
+                </button>
+              )}
             </div>
           </DialogContent>
         </Dialog>

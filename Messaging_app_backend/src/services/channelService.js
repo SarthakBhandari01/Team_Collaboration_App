@@ -64,6 +64,15 @@ export const deleteChannelService = async (channelId, userId) => {
       });
     }
 
+    // Prevent deleting the general channel
+    if (channel.name === "general") {
+      throw new ClientError({
+        message: "Cannot delete the general channel",
+        explaination: "The general channel is protected and cannot be deleted",
+        statusCode: StatusCodes.FORBIDDEN,
+      });
+    }
+
     // Check if user is admin of workspace
     const isAdmin = isUserAdminOfWorkspace(workspace, userId);
     if (!isAdmin) {

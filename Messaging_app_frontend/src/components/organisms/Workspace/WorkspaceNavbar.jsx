@@ -19,6 +19,8 @@ export const WorkspaceNavbar = () => {
       if (error.status === 403) {
         logout();
         navigate("/auth/signin");
+      } else {
+        navigate("/home");
       }
     }
     if (workspace) {
