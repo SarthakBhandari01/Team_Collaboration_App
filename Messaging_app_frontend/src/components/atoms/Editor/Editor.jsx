@@ -27,7 +27,7 @@ export const Editor = ({ onSubmit }) => {
     if (!containerRef) return;
     const container = containerRef.current;
     const editorContainer = container.appendChild(
-      container.ownerDocument.createElement("div")
+      container.ownerDocument.createElement("div"),
     );
     const option = {
       theme: "snow",
@@ -93,7 +93,7 @@ export const Editor = ({ onSubmit }) => {
               size="iconSm"
               onClick={() => {
                 const messageContent = JSON.stringify(
-                  quillRef.current?.getContents()
+                  quillRef.current?.getContents(),
                 );
                 onSubmit({
                   body: messageContent,

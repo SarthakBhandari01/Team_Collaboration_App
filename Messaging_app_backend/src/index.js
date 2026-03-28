@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import connectDB from "./config/dbConfig.js";
 import { PORT } from "./config/serverConfig.js";
 import channelHandler from "./controllers/channelSocketController.js";
+import dmMessageHandler from "./controllers/dmSocketController.js";
 import messageHandler from "./controllers/messageSocketController.js";
 import apiRouter from "./routes/apiRouter.js";
 
@@ -33,6 +34,7 @@ app.use("/api", apiRouter); //if the url starts with "/api" then the request is 
 io.on("connection", (socket) => {
   messageHandler(io, socket);
   channelHandler(io, socket);
+  dmMessageHandler(io, socket);
 });
 
 server.listen(PORT, async () => {

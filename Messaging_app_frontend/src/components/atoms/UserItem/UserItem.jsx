@@ -17,8 +17,41 @@ const userItemVariants = cva(
     },
   }
 );
-export const UserItem = ({ variant = "default", id, image, label }) => {
+export const UserItem = ({
+  variant = "default",
+  id,
+  image,
+  label,
+  conversationId,
+  onClick,
+}) => {
   const { workspace } = useCurrentWorkspace();
+
+  // If onClick is provided, use button behavior
+  if (onClick) {
+    return (
+      <Button
+        variant="transparent"
+        size="sm"
+        className={cn(userItemVariants({ variant }))}
+        onClick={onClick}
+      >
+        <Avatar>
+          <AvatarImage src={image} className="rounded-md " />
+          <AvatarFallback className="rounded-md bg-sky-500 text-white">
+            {label?.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <span className="text-sm truncate">{label}</span>
+      </Button>
+    );
+  }
+
+  // Otherwise use Link for navigation
+  const linkPath = conversationId
+    ? `/workspaces/${workspace?._id}/conversations/${conversationId}`
+    : `/workspaces/${workspace?._id}/members/${id}`;
+
   return (
     <Button
       variant="transparent"
@@ -26,7 +59,7 @@ export const UserItem = ({ variant = "default", id, image, label }) => {
       className={cn(userItemVariants({ variant }))}
       asChild
     >
-    <Link to={`/workspaces/${workspace?._id}/members/${id}`}>
+      <Link to={linkPath}>
         <Avatar>
           <AvatarImage src={image} className="rounded-md " />
           <AvatarFallback className="rounded-md bg-sky-500 text-white">

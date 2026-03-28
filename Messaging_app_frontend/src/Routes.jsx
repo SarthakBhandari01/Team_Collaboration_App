@@ -8,6 +8,7 @@ import { NotFound } from "@/pages/NotFound/Notfound";
 import { ProtectedRoute } from "./components/molecules/ProtectedRoute/protectedRoute";
 import { Home } from "./pages/Home/Home";
 import { Channel } from "./pages/Workspace/Channel";
+import { DirectMessage } from "./pages/Workspace/DirectMessage";
 import { JoinPage } from "./pages/Workspace/joinPage";
 import { WorkspaceLayout } from "./pages/Workspace/Layout";
 
@@ -52,6 +53,16 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <WorkspaceLayout>
               <Channel />
+            </WorkspaceLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workspaces/:workspaceId/conversations/:conversationId"
+        element={
+          <ProtectedRoute>
+            <WorkspaceLayout>
+              <DirectMessage />
             </WorkspaceLayout>
           </ProtectedRoute>
         }

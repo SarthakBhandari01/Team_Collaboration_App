@@ -22,7 +22,7 @@ export const WorkspaceSwitcher = () => {
   const { workspaces, isFetching: isFetchingWorkspace } = useFetchWorkspace();
 
   return (
-    <DropdownMenu>  
+    <DropdownMenu>
       <DropdownMenuTrigger>
         <Button className="size-9 relative overflow-hidden text-xl bg-[#ABABAD] hover:bg-[#ABABAD]/80 font-semibold text-slate-800">
           {isFetching ? (
