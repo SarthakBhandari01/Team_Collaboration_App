@@ -9,7 +9,7 @@ import { ProtectedRoute } from "./components/molecules/ProtectedRoute/protectedR
 import { Home } from "./pages/Home/Home";
 import { Channel } from "./pages/Workspace/Channel";
 import { DirectMessage } from "./pages/Workspace/DirectMessage";
-import { JoinPage } from "./pages/Workspace/joinPage";
+import { JoinPage } from "./pages/Workspace/JoinPage";
 import { WorkspaceLayout } from "./pages/Workspace/Layout";
 import { Notifications } from "./pages/Workspace/Notifications";
 import { WorkspaceIndex } from "./pages/Workspace/WorkspaceIndex";
