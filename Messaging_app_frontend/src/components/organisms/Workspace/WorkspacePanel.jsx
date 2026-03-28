@@ -1,7 +1,6 @@
 import {
   AlertTriangleIcon,
   HashIcon,
-  Loader,
   MessageSquareTextIcon,
   SendHorizonalIcon,
 } from "lucide-react";
@@ -9,10 +8,11 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { SideBarItem } from "@/components/atoms/SideBarItem/SideBarItem";
 import { UserItem } from "@/components/atoms/UserItem/userItem";
+import { SidebarSkeleton } from "@/components/molecules/Skeletons/Skeletons";
 import { WorkspacePannelHeader } from "@/components/molecules/Workspace/WorkspacePanelHeader";
 import { WorkspacePanelSection } from "@/components/molecules/Workspace/WorkspacePanelSection";
-import { useGetConversations } from "@/hooks/apis/conversations/useGetConversations";
 import { useCreateConversation } from "@/hooks/apis/conversations/useCreateConversation";
+import { useGetConversations } from "@/hooks/apis/conversations/useGetConversations";
 import { useGetWorkspaceById } from "@/hooks/apis/workspaces/useGetWorkspaceById";
 import { useAuth } from "@/hooks/context/useAuth";
 import { useCreateChannelModal } from "@/hooks/context/useCreateChannelModal";
@@ -48,8 +48,11 @@ export const WorkspacePanel = () => {
 
   if (isFetching) {
     return (
-      <div className="flex flex-col gap-y-2 h-full items-center justify-center text-white">
-        <Loader className="animate-spin size-6 text-white" />
+      <div className="flex flex-col h-full">
+        <div className="h-[49px] border-b border-white/10 flex items-center px-4">
+          <div className="h-6 w-32 bg-white/10 animate-pulse rounded" />
+        </div>
+        <SidebarSkeleton />
       </div>
     );
   }
@@ -63,7 +66,7 @@ export const WorkspacePanel = () => {
   }
 
   return (
-    <div className="flex flex-col h-full  ">
+    <div className="flex flex-col h-full overflow-y-auto dark-scrollbar">
       <WorkspacePannelHeader workspace={workspace} />
       <div className="flex flex-col px-2 mt-3">
         <SideBarItem

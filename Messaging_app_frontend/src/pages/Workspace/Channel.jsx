@@ -1,15 +1,23 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon, TriangleAlertIcon } from "lucide-react";
+import { TriangleAlertIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 
 import { ChannelHeader } from "@/components/molecules/Channels/ChannelHeader";
 import { ChatInput } from "@/components/molecules/ChatInput/ChatInput";
+import { DateDivider } from "@/components/molecules/Messages/DateDivider";
+import { ChannelEmptyState } from "@/components/molecules/Messages/EmptyStates";
 import { Message } from "@/components/molecules/Messages/Message";
+import { MessageListSkeleton } from "@/components/molecules/Skeletons/Skeletons";
 import { useGetChannelById } from "@/hooks/apis/channels/useGetChannelById";
 import { useGetChannelMessages } from "@/hooks/apis/channels/useGetChannelMessages";
 import { useChannelMessages } from "@/hooks/context/useChannelMessages";
 import { useSocket } from "@/hooks/context/useSocket";
+import {
+  formatDateDivider,
+  formatRelativeTime,
+  getDateKey,
+} from "@/utils/dateUtils";
 
 export const Channel = () => {
   const { channelId } = useParams();
@@ -53,8 +61,11 @@ export const Channel = () => {
 
   if (isFetching) {
     return (
-      <div className="h-full flex-1 flex items-center justify-center">
-        <Loader2Icon className="size-5 animate-spin text-muted-foreground" />
+      <div className="flex flex-col h-full">
+        <div className="h-[50px] border-b flex items-center px-4">
+          <div className="h-6 w-32 bg-muted animate-pulse rounded" />
+        </div>
+        <MessageListSkeleton count={6} />
       </div>
     );
   }
@@ -66,37 +77,42 @@ export const Channel = () => {
       </div>
     );
   }
+  // Group messages by date for dividers
+  const groupedMessages = messageList?.reduce((groups, message) => {
+    const dateKey = getDateKey(message.createdAt);
+    if (!groups[dateKey]) {
+      groups[dateKey] = [];
+    }
+    groups[dateKey].push(message);
+    return groups;
+  }, {});
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white">
       <ChannelHeader name={channelDetails?.name} channelId={channelId} />
       <div
         ref={messageContainerListRef}
-        className="flex-5 overflow-y-auto p-5 gap-y-2"
+        className="flex-1 overflow-y-auto messages-scrollbar"
       >
-        {messageList?.map((message) => {
-          const formatedDate = new Date(message.createdAt).toLocaleString(
-            "en-IN",
-            {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            },
-          );
-          return (
-            <Message
-              key={message._id}
-              body={message.body}
-              authorImage={message.senderId?.avatar}
-              authorName={message.senderId?.username}
-              createdAt={formatedDate}
-            />
-          );
-        })}
+        {messageList?.length === 0 ? (
+          <ChannelEmptyState channelName={channelDetails?.name} />
+        ) : (
+          Object.entries(groupedMessages || {}).map(([dateKey, messages]) => (
+            <div key={dateKey}>
+              <DateDivider date={formatDateDivider(dateKey)} />
+              {messages.map((message) => (
+                <Message
+                  key={message._id}
+                  body={message.body}
+                  authorImage={message.senderId?.avatar}
+                  authorName={message.senderId?.username}
+                  createdAt={formatRelativeTime(message.createdAt)}
+                />
+              ))}
+            </div>
+          ))
+        )}
       </div>
-      <div className="flex-1" />
       <ChatInput />
     </div>
   );

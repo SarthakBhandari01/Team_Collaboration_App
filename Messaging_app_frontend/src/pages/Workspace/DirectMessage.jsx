@@ -1,15 +1,24 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon, TriangleAlertIcon } from "lucide-react";
+import { TriangleAlertIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChatInput } from "@/components/molecules/ChatInput/ChatInput";
+import { DateDivider } from "@/components/molecules/Messages/DateDivider";
+import { DMEmptyState } from "@/components/molecules/Messages/EmptyStates";
 import { Message } from "@/components/molecules/Messages/Message";
+import { MessageListSkeleton } from "@/components/molecules/Skeletons/Skeletons";
 import { useGetConversationById } from "@/hooks/apis/conversations/useGetConversationById";
 import { useGetConversationMessages } from "@/hooks/apis/conversations/useGetConversationMessages";
 import { useAuth } from "@/hooks/context/useAuth";
 import { useConversationMessages } from "@/hooks/context/useConversationMessages";
 import { useSocket } from "@/hooks/context/useSocket";
+import {
+  formatDateDivider,
+  formatRelativeTime,
+  getDateKey,
+} from "@/utils/dateUtils";
 
 export const DirectMessage = () => {
   const { conversationId } = useParams();
@@ -61,8 +70,12 @@ export const DirectMessage = () => {
 
   if (isFetching) {
     return (
-      <div className="h-full flex-1 flex items-center justify-center">
-        <Loader2Icon className="size-5 animate-spin text-muted-foreground" />
+      <div className="flex flex-col h-full">
+        <div className="h-[49px] border-b flex items-center px-4 gap-2">
+          <div className="size-8 bg-muted animate-pulse rounded-md" />
+          <div className="h-5 w-24 bg-muted animate-pulse rounded" />
+        </div>
+        <MessageListSkeleton count={6} />
       </div>
     );
   }
@@ -78,16 +91,31 @@ export const DirectMessage = () => {
     );
   }
 
+  // Group messages by date for dividers
+  const groupedMessages = conversationMessageList?.reduce((groups, message) => {
+    const dateKey = getDateKey(message.createdAt);
+    if (!groups[dateKey]) {
+      groups[dateKey] = [];
+    }
+    groups[dateKey].push(message);
+    return groups;
+  }, {});
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white">
       {/* Header with other member's name */}
       <div className="flex items-center px-4 h-[49px] border-b">
         <div className="flex items-center gap-2">
-          <img
-            src={otherMember?.avatar}
-            alt={otherMember?.username}
-            className="size-8 rounded-md"
-          />
+          <Avatar className="size-8 rounded-md">
+            <AvatarImage
+              src={otherMember?.avatar}
+              alt={otherMember?.username}
+              className="rounded-md"
+            />
+            <AvatarFallback className="rounded-md bg-blue-500 text-white font-medium">
+              {otherMember?.username?.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
           <span className="text-lg font-bold">{otherMember?.username}</span>
         </div>
       </div>
@@ -95,33 +123,28 @@ export const DirectMessage = () => {
       {/* Messages */}
       <div
         ref={messageContainerListRef}
-        className="flex-5 overflow-y-auto p-5 gap-y-2"
+        className="flex-1 overflow-y-auto messages-scrollbar"
       >
-        {conversationMessageList?.map((message) => {
-          const formatedDate = new Date(message.createdAt).toLocaleString(
-            "en-IN",
-            {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            },
-          );
-          return (
-            <Message
-              key={message._id}
-              body={message.body}
-              authorImage={message.senderId?.avatar}
-              authorName={message.senderId?.username}
-              createdAt={formatedDate}
-            />
-          );
-        })}
+        {conversationMessageList?.length === 0 ? (
+          <DMEmptyState memberName={otherMember?.username} />
+        ) : (
+          Object.entries(groupedMessages || {}).map(([dateKey, messages]) => (
+            <div key={dateKey}>
+              <DateDivider date={formatDateDivider(dateKey)} />
+              {messages.map((message) => (
+                <Message
+                  key={message._id}
+                  body={message.body}
+                  authorImage={message.senderId?.avatar}
+                  authorName={message.senderId?.username}
+                  createdAt={formatRelativeTime(message.createdAt)}
+                />
+              ))}
+            </div>
+          ))
+        )}
       </div>
 
-      <div className="flex-1" />
       <ChatInput conversationId={conversationId} type="dm" />
     </div>
   );
