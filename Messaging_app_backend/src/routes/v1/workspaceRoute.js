@@ -10,6 +10,7 @@ import {
   getWorkspaceByJoinCode,
   joinWorkspaceController,
   resetJoinCodeController,
+  sendInviteEmail,
   updateWorkspace,
 } from "../../controllers/workspaceController.js";
 import { isAuthenticated } from "../../middleware/authMiddleware.js";
@@ -33,17 +34,19 @@ router.put(
   "/:workspaceId/members",
   validate(addMemberToWorkspaceSchema),
   isAuthenticated,
-  addMemberToWorkspace
+  addMemberToWorkspace,
 );
 router.put(
   "/:workspaceId/channels",
   validate(addChannelToWorkspaceSchema),
   isAuthenticated,
-  addChannelToWorkspace
+  addChannelToWorkspace,
 );
 router.put(
   "/:workspaceId/joinCode/reset",
   isAuthenticated,
-  resetJoinCodeController
+  resetJoinCodeController,
 );
+router.post("/:workspaceId/invite-email", isAuthenticated, sendInviteEmail);
+
 export default router;

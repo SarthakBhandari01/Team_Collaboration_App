@@ -4,6 +4,7 @@ import channelRouter from "./channel.js";
 import conversationRouter from "./conversation.js";
 import memberRouter from "./member.js";
 import messageRouter from "./message.js";
+import notificationRouter from "./notification.js";
 import searchRouter from "./search.js";
 import userRouter from "./user.js";
 import workspaceRouter from "./workspaceRoute.js";
@@ -17,5 +18,6 @@ router.use("/members", memberRouter);
 router.use("/messages", messageRouter);
 router.use("/conversations", conversationRouter);
 router.use("/search", searchRouter);
+router.use("/notifications", notificationRouter);
 
 export default router;

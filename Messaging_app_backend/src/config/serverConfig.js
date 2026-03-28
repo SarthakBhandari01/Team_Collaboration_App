@@ -17,3 +17,5 @@ export const JWT_EXPIRY = process.env.JWT_EXPIRY;
 export const MAIL_ID = process.env.MAIL_ID;
 
 export const MAIL_PASSWORD = process.env.MAIL_PASSWORD;
+
+export const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";

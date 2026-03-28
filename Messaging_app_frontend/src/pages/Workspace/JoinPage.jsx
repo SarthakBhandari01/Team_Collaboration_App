@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import VerificationInput from "react-verification-input";
 
@@ -7,13 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 
 export const JoinPage = () => {
   const { workspaceId } = useParams();
-  const { joinWorkspaceMutation } = useJoinWorkspace(workspaceId);
+  const [joinCode, setJoinCode] = useState("");
+  const { joinWorkspaceMutation, isPending } = useJoinWorkspace(workspaceId);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  async function handleAddMemberToWorkspace(joinCode) {
+  async function handleAddMemberToWorkspace(code) {
     try {
-      await joinWorkspaceMutation(joinCode);
+      await joinWorkspaceMutation(code);
       toast({
         title: "You have been added to workspace successfully",
         type: "Success",
@@ -21,8 +23,14 @@ export const JoinPage = () => {
       navigate(`/workspaces/${workspaceId}`);
     } catch (error) {
       console.log("Error in adding member to workspace", error);
+      toast({
+        title: "Failed to join workspace",
+        description: error?.message || "Invalid join code or you may already be a member",
+        variant: "destructive",
+      });
     }
   }
+
   return (
     <div className="flex flex-col justify-center items-center gap-y-8 h-[100vh] bg-white rounded-lg shadow-sm">
       <div className="flex flex-col justify-center items-center gap-y-4">
@@ -31,6 +39,8 @@ export const JoinPage = () => {
           <p>Enter the code you received to join the workspace</p>
         </div>
         <VerificationInput
+          value={joinCode}
+          onChange={setJoinCode}
           onComplete={handleAddMemberToWorkspace}
           length={6}
           classNames={{
@@ -43,6 +53,9 @@ export const JoinPage = () => {
           }}
           autoFocus
         />
+        {isPending && (
+          <p className="text-sm text-muted-foreground">Joining workspace...</p>
+        )}
       </div>
       <div className="flex gap-x-4">
         <Button size="lg" variant="outline">

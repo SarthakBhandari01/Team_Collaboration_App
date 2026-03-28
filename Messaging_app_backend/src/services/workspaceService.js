@@ -1,10 +1,14 @@
 import { StatusCodes } from "http-status-codes";
 import uuid4 from "uuid4";
 
+import transporter from "../config/mailConfig.js";
+import { FRONTEND_URL, MAIL_ID } from "../config/serverConfig.js";
 import channelRepository from "../repositories/channelRepository.js";
+import userRepository from "../repositories/userRepository.js";
 import workspaceRepository from "../repositories/workspaceRepository.js";
 import ClientError from "../utils/errors/clientError.js";
 import validationError from "../utils/errors/validationError.js";
+import { createNotification } from "./notificationService.js";
 
 export const isUserAdminOfWorkspace = (workspace, userId) => {
   const response = workspace.members.find((member) => {
@@ -262,7 +266,7 @@ export const addChannelToWorkspaceService = async (
   channelName
 ) => {
   try {
-    const workspace = await workspaceRepository.getById(workspaceId);
+    const workspace = await workspaceRepository.getWorkspaceDetailsById(workspaceId);
     if (!workspace) {
       throw new ClientError({
         message: "Workspace not found",
@@ -283,6 +287,25 @@ export const addChannelToWorkspaceService = async (
       workspaceId,
       channelName
     );
+
+    // Get the user who created the channel
+    const creator = await userRepository.getById(userId);
+
+    // Notify all workspace members about the new channel
+    for (const member of workspace.members) {
+      const memberId = member.memberId._id || member.memberId;
+      if (memberId.toString() !== userId.toString()) {
+        await createNotification(
+          memberId,
+          workspaceId,
+          "channel_created",
+          "New channel created",
+          `#${channelName} was created in ${workspace.name} by ${creator?.username || "someone"}`,
+          { channelName, creatorId: userId, creatorName: creator?.username }
+        );
+      }
+    }
+
     return response;
   } catch (error) {
     console.log("Add channel to workspace Service error ", error);
@@ -317,9 +340,114 @@ export const joinWorkspaceService = async (workspaceId, joinCode, userId) => {
       "member"
     );
 
+    // Get the user who joined
+    const joiningUser = await userRepository.getById(userId);
+
+    // Notify all admins that a new member joined
+    const admins = workspace.members.filter((m) => m.role === "admin");
+    for (const admin of admins) {
+      const adminId = admin.memberId._id || admin.memberId;
+      if (adminId.toString() !== userId.toString()) {
+        await createNotification(
+          adminId,
+          workspaceId,
+          "member_joined",
+          "New member joined",
+          `${joiningUser?.username || "Someone"} joined ${workspace.name}`,
+          { memberId: userId, memberName: joiningUser?.username }
+        );
+      }
+    }
+
     return updatedWorkspace;
   } catch (error) {
     console.log("join workspace Service error", error);
+    throw error;
+  }
+};
+
+export const sendInviteEmailService = async (workspaceId, email, userId) => {
+  try {
+    const workspace = await workspaceRepository.getWorkspaceDetailsById(
+      workspaceId
+    );
+    if (!workspace) {
+      throw new ClientError({
+        message: "Workspace not found",
+        explanation: "Invalid data sent from the client",
+        statusCode: StatusCodes.NOT_FOUND,
+      });
+    }
+
+    const isAdmin = isUserAdminOfWorkspace(workspace, userId);
+    if (!isAdmin) {
+      throw new ClientError({
+        message: "Only admins can send invite emails",
+        explanation: "Invalid data sent from the client",
+        statusCode: StatusCodes.UNAUTHORIZED,
+      });
+    }
+
+    const inviter = await userRepository.getById(userId);
+    const joinLink = `${FRONTEND_URL}/workspaces/join/${workspaceId}`;
+
+    const mailOptions = {
+      from: `"Team Collaboration" <${MAIL_ID}>`,
+      to: email,
+      subject: `You're invited to join ${workspace.name} on Team Collaboration!`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #611f69 0%, #4a154b 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+            .button { display: inline-block; background: #611f69; color: white; padding: 14px 35px; text-decoration: none; border-radius: 4px; margin-top: 20px; font-weight: bold; }
+            .code-box { background: #e0e0e0; padding: 15px; border-radius: 4px; font-size: 24px; font-weight: bold; letter-spacing: 3px; text-align: center; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>You're Invited! 🎉</h1>
+            </div>
+            <div class="content">
+              <p>Hi there!</p>
+              <p><strong>${inviter?.username || "Someone"}</strong> has invited you to join the workspace <strong>${workspace.name}</strong> on Team Collaboration.</p>
+              <p>Use the join code below on the join page:</p>
+              <div class="code-box">${workspace.joinCode}</div>
+              <p style="text-align: center;">
+                <a href="${joinLink}" class="button">Go to Join Page</a>
+              </p>
+              <p style="font-size: 12px; color: #666;">If you don't have an account yet, you'll need to sign up first, then use the link above to join.</p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Team Collaboration. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    // Create notification for the inviter
+    await createNotification(
+      userId,
+      workspaceId,
+      "workspace_invite",
+      "Invite sent",
+      `Invitation sent to ${email} for ${workspace.name}`,
+      { email }
+    );
+
+    return { success: true, email };
+  } catch (error) {
+    console.log("Send invite email service error:", error);
     throw error;
   }
 };

@@ -12,7 +12,7 @@ export const createWorkspaceRequest = async ({ name, description, token }) => {
         headers: {
           "x-access-token": token,
         },
-      }
+      },
     );
     return response?.data?.data;
   } catch (error) {
@@ -73,7 +73,7 @@ export const updateWorkspaceRequest = async ({ workspaceId, token, name }) => {
         headers: {
           "x-access-token": token,
         },
-      }
+      },
     );
     console.log("Response in update workspace request ", response);
     return response?.data;
@@ -96,7 +96,7 @@ export const addChannelToWorkspace = async ({
         headers: {
           "x-access-token": token,
         },
-      }
+      },
     );
     console.log("Response in add channel to workspace request ", response);
     return response?.data;
@@ -115,7 +115,7 @@ export const resetJoinCodeRequest = async ({ workspaceId, token }) => {
         headers: {
           "x-access-token": token,
         },
-      }
+      },
     );
     console.log("Response in Reset Join code request ", response);
     return response?.data?.data;
@@ -138,12 +138,30 @@ export const joinWorkspaceRequest = async ({
         headers: {
           "x-access-token": token,
         },
-      }
+      },
     );
     console.log("Response in Join workspace request ", response);
     return response?.data?.data;
   } catch (error) {
     console.error("Error in  Join workspace request", error);
     throw error.response.data;
+  }
+};
+
+export const sendInviteEmailRequest = async ({ workspaceId, email, token }) => {
+  try {
+    const response = await axios.post(
+      `/workspaces/${workspaceId}/invite-email`,
+      { email },
+      {
+        headers: {
+          "x-access-token": token,
+        },
+      },
+    );
+    return response?.data?.data;
+  } catch (error) {
+    console.error("Error in send invite email request", error);
+    throw error.response?.data || error;
   }
 };

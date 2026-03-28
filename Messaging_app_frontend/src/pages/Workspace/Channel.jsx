@@ -12,6 +12,8 @@ import { MessageListSkeleton } from "@/components/molecules/Skeletons/Skeletons"
 import { useGetChannelById } from "@/hooks/apis/channels/useGetChannelById";
 import { useGetChannelMessages } from "@/hooks/apis/channels/useGetChannelMessages";
 import { useDeleteMessage } from "@/hooks/apis/messages/useDeleteMessage";
+import { useGetWorkspaceById } from "@/hooks/apis/workspaces/useGetWorkspaceById";
+import { useAuth } from "@/hooks/context/useAuth";
 import { useChannelMessages } from "@/hooks/context/useChannelMessages";
 import { useSocket } from "@/hooks/context/useSocket";
 import {
@@ -21,8 +23,10 @@ import {
 } from "@/utils/dateUtils";
 
 export const Channel = () => {
-  const { channelId } = useParams();
+  const { channelId, workspaceId } = useParams();
   const { isFetching, isError, channelDetails } = useGetChannelById(channelId);
+  const { workspace } = useGetWorkspaceById(workspaceId);
+  const { auth } = useAuth();
   const { joinChannel } = useSocket();
   const { messageList, setMessageList } = useChannelMessages();
   const { isSuccess, messages } = useGetChannelMessages(channelId);
@@ -30,6 +34,12 @@ export const Channel = () => {
   const queryClient = useQueryClient();
   const messageContainerListRef = useRef(null);
   const hasJoinedRef = useRef(null);
+
+  // Check if current user is an admin
+  const isAdmin = workspace?.members?.some(
+    (member) =>
+      member.memberId?._id === auth?.user?._id && member.role === "admin",
+  );
 
   useEffect(() => {
     if (messageContainerListRef.current) {
@@ -97,7 +107,7 @@ export const Channel = () => {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <ChannelHeader name={channelDetails?.name} channelId={channelId} />
+      <ChannelHeader name={channelDetails?.name} channelId={channelId} isAdmin={isAdmin} />
       <div
         ref={messageContainerListRef}
         className="flex-1 overflow-y-auto messages-scrollbar"

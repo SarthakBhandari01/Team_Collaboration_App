@@ -11,6 +11,7 @@ import { Channel } from "./pages/Workspace/Channel";
 import { DirectMessage } from "./pages/Workspace/DirectMessage";
 import { JoinPage } from "./pages/Workspace/joinPage";
 import { WorkspaceLayout } from "./pages/Workspace/Layout";
+import { Notifications } from "./pages/Workspace/Notifications";
 import { WorkspaceIndex } from "./pages/Workspace/WorkspaceIndex";
 
 export const AppRoutes = () => {
@@ -66,6 +67,16 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <WorkspaceLayout>
               <DirectMessage />
+            </WorkspaceLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workspaces/:workspaceId/notifications"
+        element={
+          <ProtectedRoute>
+            <WorkspaceLayout>
+              <Notifications />
             </WorkspaceLayout>
           </ProtectedRoute>
         }

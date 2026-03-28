@@ -1,14 +1,10 @@
-import {
-  BellIcon,
-  HomeIcon,
-  MessageSquareIcon,
-  MoreHorizontalIcon,
-} from "lucide-react";
+import { BellIcon, HomeIcon, MessageSquareIcon } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { UserButton } from "@/components/atoms/UserButton/UserButton";
 import { SidebarButton } from "@/components/molecules/SidebarButton/SidebarButton";
 import { useGetConversations } from "@/hooks/apis/conversations/useGetConversations";
+import { useGetUnreadCount } from "@/hooks/apis/notifications/useGetUnreadCount";
 import { useGetWorkspaceById } from "@/hooks/apis/workspaces/useGetWorkspaceById";
 
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
@@ -18,6 +14,7 @@ export const WorkspaceSidebar = () => {
   const navigate = useNavigate();
   const { workspace } = useGetWorkspaceById(workspaceId);
   const { conversations } = useGetConversations(workspaceId);
+  const { unreadCount } = useGetUnreadCount();
 
   function handleHome() {
     const generalChannel = workspace?.channels?.find(
@@ -48,11 +45,18 @@ export const WorkspaceSidebar = () => {
         label={"DMs"}
         onClick={handleMessage}
       />
-      <SidebarButton
-        Icon={BellIcon}
-        label={"Notifications"}
-        onClick={() => navigate(`/workspaces/${workspaceId}/notifications`)}
-      />
+      <div className="relative">
+        <SidebarButton
+          Icon={BellIcon}
+          label={"Notifications"}
+          onClick={() => navigate(`/workspaces/${workspaceId}/notifications`)}
+        />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        )}
+      </div>
       <div className="flex flex-col items-center justify-center mt-auto mb-5 gap-y-1">
         <UserButton />
       </div>

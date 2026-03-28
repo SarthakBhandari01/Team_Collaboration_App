@@ -10,6 +10,7 @@ import {
   getWorkspaceService,
   joinWorkspaceService,
   resetWorkspaceJoinCodeService,
+  sendInviteEmailService,
   updateWorkspaceService,
 } from "../services/workspaceService.js";
 import {
@@ -43,7 +44,7 @@ export const getAllWorkspacesUserIsMemberOf = async (req, res) => {
     return res
       .status(StatusCodes.OK)
       .json(
-        successResponse(response, "Fetched all the workspaces successfully")
+        successResponse(response, "Fetched all the workspaces successfully"),
       );
   } catch (error) {
     console.log(error);
@@ -123,12 +124,12 @@ export const addMemberToWorkspace = async (req, res) => {
       workspaceId,
       memberId,
       userId,
-      role
+      role,
     );
     return res
       .status(StatusCodes.OK)
       .json(
-        successResponse(response, " Member added to workspace successfully")
+        successResponse(response, " Member added to workspace successfully"),
       );
   } catch (error) {
     console.log("Add Member to workspace controller error ", error);
@@ -150,12 +151,12 @@ export const addChannelToWorkspace = async (req, res) => {
     const response = await addChannelToWorkspaceService(
       workspaceId,
       userId,
-      channelName
+      channelName,
     );
     return res
       .status(StatusCodes.OK)
       .json(
-        successResponse(response, " Channel added to workspace successfully")
+        successResponse(response, " Channel added to workspace successfully"),
       );
   } catch (error) {
     console.log("Add channel to workspace controller error ", error);
@@ -177,7 +178,7 @@ export const updateWorkspace = async (req, res) => {
     const response = await updateWorkspaceService(
       workspaceId,
       workspaceData,
-      userId
+      userId,
     );
     return res
       .status(StatusCodes.OK)
@@ -197,12 +198,12 @@ export const resetJoinCodeController = async (req, res) => {
   try {
     const response = await resetWorkspaceJoinCodeService(
       req.params.workspaceId,
-      req.user
+      req.user,
     );
     return res
       .status(StatusCodes.OK)
       .json(
-        successResponse(response, "Workspace join code reset successfully")
+        successResponse(response, "Workspace join code reset successfully"),
       );
   } catch (error) {
     console.log("reset join code controller error", error);
@@ -220,7 +221,7 @@ export const joinWorkspaceController = async (req, res) => {
     const response = await joinWorkspaceService(
       req.params.workspaceId,
       req.body.joinCode,
-      req.user
+      req.user,
     );
     return res
       .status(StatusCodes.OK)
@@ -231,6 +232,33 @@ export const joinWorkspaceController = async (req, res) => {
       return res.status(error.statusCode).json(customErrorResponse(error));
     }
 
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(internalErrorResponse(error));
+  }
+};
+
+export const sendInviteEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(customErrorResponse({ message: "Email is required" }));
+    }
+    const response = await sendInviteEmailService(
+      req.params.workspaceId,
+      email,
+      req.user,
+    );
+    return res
+      .status(StatusCodes.OK)
+      .json(successResponse(response, "Invite email sent successfully"));
+  } catch (error) {
+    console.log("send invite email controller error", error);
+    if (error.statusCode) {
+      return res.status(error.statusCode).json(customErrorResponse(error));
+    }
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(internalErrorResponse(error));

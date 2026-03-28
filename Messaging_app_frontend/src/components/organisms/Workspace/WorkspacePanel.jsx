@@ -4,10 +4,12 @@ import {
   MessageSquareTextIcon,
   SendHorizonalIcon,
 } from "lucide-react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { SideBarItem } from "@/components/atoms/SideBarItem/SideBarItem";
 import { UserItem } from "@/components/atoms/UserItem/userItem";
+import { WorkspaceInviteModal } from "@/components/organisms/Modals/WorkspaceInviteModal";
 import { SidebarSkeleton } from "@/components/molecules/Skeletons/Skeletons";
 import { WorkspacePannelHeader } from "@/components/molecules/Workspace/WorkspacePanelHeader";
 import { WorkspacePanelSection } from "@/components/molecules/Workspace/WorkspacePanelSection";
@@ -26,6 +28,13 @@ export const WorkspacePanel = () => {
   const { setOpenCreateChannelModal } = useCreateChannelModal();
   const { auth } = useAuth();
   const navigate = useNavigate();
+  const [openInviteModal, setOpenInviteModal] = useState(false);
+
+  // Check if current user is an admin
+  const isAdmin = workspace?.members?.some(
+    (member) =>
+      member.memberId?._id === auth?.user?._id && member.role === "admin",
+  );
 
   const handleCreateConversation = async (memberId) => {
     try {
@@ -40,10 +49,8 @@ export const WorkspacePanel = () => {
     }
   };
 
-  const handleDMClick = () => {
-    // For now, just refetch conversations
-    // TODO: Add a proper modal for selecting users
-    refetchConversations();
+  const handleInviteClick = () => {
+    setOpenInviteModal(true);
   };
 
   if (isFetching) {
@@ -67,13 +74,20 @@ export const WorkspacePanel = () => {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto dark-scrollbar">
+      <WorkspaceInviteModal
+        openInviteModal={openInviteModal}
+        workspaceName={workspace?.name}
+        joinCode={workspace?.joinCode}
+        setOpenInviteModal={setOpenInviteModal}
+        workspaceId={workspace?._id}
+      />
       <WorkspacePannelHeader workspace={workspace} />
       <div className="flex flex-col px-2 mt-3">
         <WorkspacePanelSection
           label={"Channels"}
-          onIconClick={() => {
-            setOpenCreateChannelModal(true);
-          }}
+          onIconClick={
+            isAdmin ? () => setOpenCreateChannelModal(true) : undefined
+          }
         >
           {workspace?.channels.map((channel) => {
             return (
@@ -88,7 +102,7 @@ export const WorkspacePanel = () => {
         </WorkspacePanelSection>
         <WorkspacePanelSection
           label={"Direct messages"}
-          onIconClick={handleDMClick}
+          onIconClick={isAdmin ? handleInviteClick : undefined}
         >
           {conversations?.map((conversation) => {
             // Find the other member (not the current user)

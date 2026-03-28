@@ -19,7 +19,7 @@ import { useUpdateChannel } from "@/hooks/apis/channels/useUpdateChannel";
 import { useConfirm } from "@/hooks/context/useConfirm";
 import { useToast } from "@/hooks/use-toast";
 
-export const ChannelHeader = ({ name, channelId }) => {
+export const ChannelHeader = ({ name, channelId, isAdmin = false }) => {
   const [renameValue, setRenameValue] = useState(name);
   const [editOpen, setEditOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -124,55 +124,65 @@ export const ChannelHeader = ({ name, channelId }) => {
               <DialogTitle># {name}</DialogTitle>
             </DialogHeader>
             <div className="px-4 pb-5 flex flex-col gap-y-2">
-              <Dialog open={editOpen} onOpenChange={setEditOpen}>
-                <DialogTrigger>
-                  <div className="px-5 py-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-100">
-                    <div className="flex justify-between item center">
-                      <div className="flex flex-col items-start gap-y-1">
-                        <p className="font-semibold text-sm">Channel Name</p>
-                        <p className="text-sm"># {name}</p>
+              {isAdmin && (
+                <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                  <DialogTrigger>
+                    <div className="px-5 py-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-100">
+                      <div className="flex justify-between item center">
+                        <div className="flex flex-col items-start gap-y-1">
+                          <p className="font-semibold text-sm">Channel Name</p>
+                          <p className="text-sm"># {name}</p>
+                        </div>
+                        <p className="font-semibold text-sm hover:underline">
+                          Edit
+                        </p>
                       </div>
-                      <p className="font-semibold text-sm hover:underline">
-                        Edit
-                      </p>
                     </div>
-                  </div>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Rename Channel</DialogTitle>
-                  </DialogHeader>
-                  <form className="space-y-4" onSubmit={handleFormSubmit}>
-                    <input
-                      type="text"
-                      required
-                      autoFocus
-                      minLength={3}
-                      maxLength={50}
-                      value={renameValue}
-                      onChange={(e) => setRenameValue(e.target.value)}
-                      placeholder="Channel Name e.g Design Team"
-                      className="w-full px-3 py-2 border rounded-md"
-                      disabled={isUpdating}
-                    />
-                    <DialogFooter className="">
-                      <DialogClose asChild>
-                        <Button
-                          variant="outline"
-                          className="font-semibold"
-                          disabled={isUpdating}
-                        >
-                          Cancel
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Rename Channel</DialogTitle>
+                    </DialogHeader>
+                    <form className="space-y-4" onSubmit={handleFormSubmit}>
+                      <input
+                        type="text"
+                        required
+                        autoFocus
+                        minLength={3}
+                        maxLength={50}
+                        value={renameValue}
+                        onChange={(e) => setRenameValue(e.target.value)}
+                        placeholder="Channel Name e.g Design Team"
+                        className="w-full px-3 py-2 border rounded-md"
+                        disabled={isUpdating}
+                      />
+                      <DialogFooter className="">
+                        <DialogClose asChild>
+                          <Button
+                            variant="outline"
+                            className="font-semibold"
+                            disabled={isUpdating}
+                          >
+                            Cancel
+                          </Button>
+                        </DialogClose>
+                        <Button type="submit" disabled={isUpdating}>
+                          {isUpdating ? "Saving..." : "Save changes"}
                         </Button>
-                      </DialogClose>
-                      <Button type="submit" disabled={isUpdating}>
-                        {isUpdating ? "Saving..." : "Save changes"}
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
-              {name !== "general" && (
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              )}
+              {!isAdmin && (
+                <div className="px-5 py-4 bg-white rounded-lg border">
+                  <div className="flex flex-col items-start gap-y-1">
+                    <p className="font-semibold text-sm">Channel Name</p>
+                    <p className="text-sm"># {name}</p>
+                  </div>
+                </div>
+              )}
+              {isAdmin && name !== "general" && (
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
