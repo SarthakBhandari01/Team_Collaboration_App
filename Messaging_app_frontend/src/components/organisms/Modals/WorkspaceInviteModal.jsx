@@ -62,8 +62,7 @@ export const WorkspaceInviteModal = ({
     if (!email.trim()) return;
 
     try {
-      const response = await sendInviteEmailMutation(email);
-      const data = response?.data;
+      const data = await sendInviteEmailMutation(email);
       
       if (data?.emailSent) {
         toast({

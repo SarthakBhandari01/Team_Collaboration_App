@@ -390,7 +390,7 @@ export const sendInviteEmailService = async (workspaceId, email, userId) => {
     // Try to send email using Resend
     let emailSent = false;
     try {
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: MAIL_ID || "Team Collaboration <onboarding@resend.dev>",
         to: email,
         subject: `You're invited to join ${workspace.name} on Team Collaboration!`,
@@ -431,9 +431,15 @@ export const sendInviteEmailService = async (workspaceId, email, userId) => {
         </html>
       `,
       });
-      emailSent = true;
+      
+      if (result?.data?.id) {
+        emailSent = true;
+        console.log("Email sent successfully via Resend:", result.data.id);
+      } else {
+        console.warn("Resend API returned unexpected response:", result);
+      }
     } catch (emailError) {
-      console.warn("Email sending failed:", emailError.message);
+      console.error("Email sending failed:", emailError);
       // Continue execution - don't throw error
     }
 
