@@ -53,9 +53,9 @@ const sendWelcomeEmail = async (user) => {
       `,
     };
     await transporter.sendMail(mailOptions);
-    console.log("Welcome email sent to:", user.email);
+    console.log("Welcome email sent successfully to:", user.email);
   } catch (error) {
-    console.error("Failed to send welcome email:", error);
+    console.error("Welcome email sending failed:", error.message);
     // Don't throw - email failure shouldn't block signup
   }
 };

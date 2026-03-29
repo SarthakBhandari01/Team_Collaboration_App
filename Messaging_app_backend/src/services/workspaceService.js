@@ -434,12 +434,9 @@ export const sendInviteEmailService = async (workspaceId, email, userId) => {
     try {
       await transporter.sendMail(mailOptions);
       emailSent = true;
-      console.log("Email sent successfully via Nodemailer");
+      console.log("Invite email sent successfully to:", email);
     } catch (emailError) {
-      console.error(
-        "Email sending failed (SMTP may be blocked):",
-        emailError.message,
-      );
+      console.error("Invite email sending failed:", emailError.message);
       // Continue execution - don't throw error
     }
 
@@ -465,7 +462,7 @@ export const sendInviteEmailService = async (workspaceId, email, userId) => {
         : `Email service unavailable. Share join code ${workspace.joinCode} manually with ${email}`,
     };
   } catch (error) {
-    console.log("Send invite email service error:", error);
+    console.error("Send invite email service error:", error);
     throw error;
   }
 };

@@ -53,7 +53,7 @@ export const WorkspaceInviteModal = ({
         title: "Join code reset successfully",
       });
     } catch (error) {
-      console.log("Error in resetting join code", error);
+      console.error("Error resetting join code:", error);
     }
   }
 

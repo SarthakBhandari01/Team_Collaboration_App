@@ -246,6 +246,15 @@ export const sendInviteEmail = async (req, res) => {
         .status(StatusCodes.BAD_REQUEST)
         .json(customErrorResponse({ message: "Email is required" }));
     }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(customErrorResponse({ message: "Invalid email format" }));
+    }
+
     const response = await sendInviteEmailService(
       req.params.workspaceId,
       email,
@@ -255,7 +264,7 @@ export const sendInviteEmail = async (req, res) => {
       .status(StatusCodes.OK)
       .json(successResponse(response, "Invite email sent successfully"));
   } catch (error) {
-    console.log("send invite email controller error", error);
+    console.error("Send invite email controller error:", error);
     if (error.statusCode) {
       return res.status(error.statusCode).json(customErrorResponse(error));
     }
