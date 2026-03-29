@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import uuid4 from "uuid4";
 
-import transporter from "../config/mailConfig.js";
+import resend from "../config/mailConfig.js";
 import { FRONTEND_URL, MAIL_ID } from "../config/serverConfig.js";
 import channelRepository from "../repositories/channelRepository.js";
 import userRepository from "../repositories/userRepository.js";
@@ -42,13 +42,13 @@ export const createWorkspaceService = async (workspaceData) => {
     await workspaceRepository.addMemberToWorkspace(
       workspace._id,
       workspaceData.owner,
-      "admin"
+      "admin",
     );
 
     //add channel
     const updatedWorkspace = await workspaceRepository.addChannelToWorkspace(
       workspace._id,
-      "general"
+      "general",
     );
 
     return updatedWorkspace;
@@ -62,7 +62,7 @@ export const createWorkspaceService = async (workspaceData) => {
         {
           error: ["Workspace with same name already exists"],
         },
-        "Workspace with same name already exists"
+        "Workspace with same name already exists",
       );
     }
 
@@ -72,9 +72,8 @@ export const createWorkspaceService = async (workspaceData) => {
 
 export const getAllWorkspacesUserIsMemberOfService = async (userId) => {
   try {
-    const workspaces = await workspaceRepository.findAllWorkspaceByMemberId(
-      userId
-    );
+    const workspaces =
+      await workspaceRepository.findAllWorkspaceByMemberId(userId);
     return workspaces;
   } catch (error) {
     console.log(" Get workspace user is member service error ", error);
@@ -114,9 +113,8 @@ export const deleteWorkspaceService = async (workspaceId, userId) => {
 
 export const getWorkspaceService = async (workspaceId, userId) => {
   try {
-    const workspace = await workspaceRepository.getWorkspaceDetailsById(
-      workspaceId
-    );
+    const workspace =
+      await workspaceRepository.getWorkspaceDetailsById(workspaceId);
     if (!workspace) {
       throw new ClientError({
         message: "Workspace not found",
@@ -143,9 +141,8 @@ export const getWorkspaceService = async (workspaceId, userId) => {
 
 export const getWorkspaceByJoinCodeService = async (joinCode, userId) => {
   try {
-    const workspace = await workspaceRepository.getWorkspaceByJoinCode(
-      joinCode
-    );
+    const workspace =
+      await workspaceRepository.getWorkspaceByJoinCode(joinCode);
     if (!workspace) {
       throw new ClientError({
         message: "Workspace not found",
@@ -173,7 +170,7 @@ export const getWorkspaceByJoinCodeService = async (joinCode, userId) => {
 export const updateWorkspaceService = async (
   workspaceId,
   workspaceData,
-  userId
+  userId,
 ) => {
   try {
     const workspace = await workspaceRepository.getById(workspaceId);
@@ -198,7 +195,7 @@ export const updateWorkspaceService = async (
     //update workspace
     const updatedWorkspace = await workspaceRepository.update(
       workspaceId,
-      workspaceData
+      workspaceData,
     );
     return updatedWorkspace;
   } catch (error) {
@@ -215,7 +212,7 @@ export const resetWorkspaceJoinCodeService = async (workspaceId, userId) => {
       {
         joinCode: newJoinCode,
       },
-      userId
+      userId,
     );
     return updatedWorkspace;
   } catch (error) {
@@ -228,7 +225,7 @@ export const addMemberToWorkspaceService = async (
   workspaceId,
   memberId,
   userId,
-  role
+  role,
 ) => {
   try {
     const workspace = await workspaceRepository.getById(workspaceId);
@@ -251,7 +248,7 @@ export const addMemberToWorkspaceService = async (
     const response = await workspaceRepository.addMemberToWorkspace(
       workspaceId,
       memberId,
-      role
+      role,
     );
     return response;
   } catch (error) {
@@ -263,10 +260,11 @@ export const addMemberToWorkspaceService = async (
 export const addChannelToWorkspaceService = async (
   workspaceId,
   userId,
-  channelName
+  channelName,
 ) => {
   try {
-    const workspace = await workspaceRepository.getWorkspaceDetailsById(workspaceId);
+    const workspace =
+      await workspaceRepository.getWorkspaceDetailsById(workspaceId);
     if (!workspace) {
       throw new ClientError({
         message: "Workspace not found",
@@ -285,7 +283,7 @@ export const addChannelToWorkspaceService = async (
 
     const response = await workspaceRepository.addChannelToWorkspace(
       workspaceId,
-      channelName
+      channelName,
     );
 
     // Get the user who created the channel
@@ -301,7 +299,7 @@ export const addChannelToWorkspaceService = async (
           "channel_created",
           "New channel created",
           `#${channelName} was created in ${workspace.name} by ${creator?.username || "someone"}`,
-          { channelName, creatorId: userId, creatorName: creator?.username }
+          { channelName, creatorId: userId, creatorName: creator?.username },
         );
       }
     }
@@ -315,9 +313,8 @@ export const addChannelToWorkspaceService = async (
 
 export const joinWorkspaceService = async (workspaceId, joinCode, userId) => {
   try {
-    const workspace = await workspaceRepository.getWorkspaceDetailsById(
-      workspaceId
-    );
+    const workspace =
+      await workspaceRepository.getWorkspaceDetailsById(workspaceId);
     if (!workspace) {
       throw new ClientError({
         explanation: "Invalid data sent from the client",
@@ -337,7 +334,7 @@ export const joinWorkspaceService = async (workspaceId, joinCode, userId) => {
     const updatedWorkspace = await workspaceRepository.addMemberToWorkspace(
       workspaceId,
       userId,
-      "member"
+      "member",
     );
 
     // Get the user who joined
@@ -354,7 +351,7 @@ export const joinWorkspaceService = async (workspaceId, joinCode, userId) => {
           "member_joined",
           "New member joined",
           `${joiningUser?.username || "Someone"} joined ${workspace.name}`,
-          { memberId: userId, memberName: joiningUser?.username }
+          { memberId: userId, memberName: joiningUser?.username },
         );
       }
     }
@@ -368,9 +365,8 @@ export const joinWorkspaceService = async (workspaceId, joinCode, userId) => {
 
 export const sendInviteEmailService = async (workspaceId, email, userId) => {
   try {
-    const workspace = await workspaceRepository.getWorkspaceDetailsById(
-      workspaceId
-    );
+    const workspace =
+      await workspaceRepository.getWorkspaceDetailsById(workspaceId);
     if (!workspace) {
       throw new ClientError({
         message: "Workspace not found",
@@ -391,11 +387,14 @@ export const sendInviteEmailService = async (workspaceId, email, userId) => {
     const inviter = await userRepository.getById(userId);
     const joinLink = `${FRONTEND_URL}/workspaces/join/${workspaceId}`;
 
-    const mailOptions = {
-      from: `"Team Collaboration" <${MAIL_ID}>`,
-      to: email,
-      subject: `You're invited to join ${workspace.name} on Team Collaboration!`,
-      html: `
+    // Try to send email using Resend
+    let emailSent = false;
+    try {
+      await resend.emails.send({
+        from: MAIL_ID || "Team Collaboration <onboarding@resend.dev>",
+        to: email,
+        subject: `You're invited to join ${workspace.name} on Team Collaboration!`,
+        html: `
         <!DOCTYPE html>
         <html>
         <head>
@@ -431,15 +430,10 @@ export const sendInviteEmailService = async (workspaceId, email, userId) => {
         </body>
         </html>
       `,
-    };
-
-    // Try to send email, but don't fail if SMTP is blocked (e.g., on Render free tier)
-    let emailSent = false;
-    try {
-      await transporter.sendMail(mailOptions);
+      });
       emailSent = true;
     } catch (emailError) {
-      console.warn("Email sending failed (SMTP may be blocked):", emailError.message);
+      console.warn("Email sending failed:", emailError.message);
       // Continue execution - don't throw error
     }
 
@@ -449,20 +443,20 @@ export const sendInviteEmailService = async (workspaceId, email, userId) => {
       workspaceId,
       "workspace_invite",
       emailSent ? "Invite sent" : "Invite link generated",
-      emailSent 
+      emailSent
         ? `Invitation sent to ${email} for ${workspace.name}`
         : `Invitation link generated for ${workspace.name}. Share the join code: ${workspace.joinCode}`,
-      { email, emailSent }
+      { email, emailSent },
     );
 
-    return { 
-      success: true, 
-      email, 
+    return {
+      success: true,
+      email,
       emailSent,
       joinCode: workspace.joinCode,
-      message: emailSent 
-        ? `Invite email sent to ${email}` 
-        : `Email service unavailable. Share join code ${workspace.joinCode} manually with ${email}`
+      message: emailSent
+        ? `Invite email sent to ${email}`
+        : `Email service unavailable. Share join code ${workspace.joinCode} manually with ${email}`,
     };
   } catch (error) {
     console.log("Send invite email service error:", error);

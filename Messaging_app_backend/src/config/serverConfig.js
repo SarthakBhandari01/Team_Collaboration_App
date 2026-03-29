@@ -18,4 +18,6 @@ export const MAIL_ID = process.env.MAIL_ID;
 
 export const MAIL_PASSWORD = process.env.MAIL_PASSWORD;
 
+export const RESEND_API_KEY = process.env.RESEND_API_KEY;
+
 export const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
