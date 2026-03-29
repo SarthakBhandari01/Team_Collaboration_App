@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import uuid4 from "uuid4";
 
-import resend from "../config/mailConfig.js";
+import transporter from "../config/mailConfig.js";
 import { FRONTEND_URL, MAIL_ID } from "../config/serverConfig.js";
 import channelRepository from "../repositories/channelRepository.js";
 import userRepository from "../repositories/userRepository.js";
@@ -387,14 +387,11 @@ export const sendInviteEmailService = async (workspaceId, email, userId) => {
     const inviter = await userRepository.getById(userId);
     const joinLink = `${FRONTEND_URL}/workspaces/join/${workspaceId}`;
 
-    // Try to send email using Resend
-    let emailSent = false;
-    try {
-      const result = await resend.emails.send({
-        from: MAIL_ID || "Team Collaboration <onboarding@resend.dev>",
-        to: email,
-        subject: `You're invited to join ${workspace.name} on Team Collaboration!`,
-        html: `
+    const mailOptions = {
+      from: `"Team Collaboration" <${MAIL_ID}>`,
+      to: email,
+      subject: `You're invited to join ${workspace.name} on Team Collaboration!`,
+      html: `
         <!DOCTYPE html>
         <html>
         <head>
@@ -430,16 +427,19 @@ export const sendInviteEmailService = async (workspaceId, email, userId) => {
         </body>
         </html>
       `,
-      });
-      
-      if (result?.data?.id) {
-        emailSent = true;
-        console.log("Email sent successfully via Resend:", result.data.id);
-      } else {
-        console.warn("Resend API returned unexpected response:", result);
-      }
+    };
+
+    // Try to send email, but don't fail if SMTP is blocked (e.g., on Render free tier)
+    let emailSent = false;
+    try {
+      await transporter.sendMail(mailOptions);
+      emailSent = true;
+      console.log("Email sent successfully via Nodemailer");
     } catch (emailError) {
-      console.error("Email sending failed:", emailError);
+      console.error(
+        "Email sending failed (SMTP may be blocked):",
+        emailError.message,
+      );
       // Continue execution - don't throw error
     }
 

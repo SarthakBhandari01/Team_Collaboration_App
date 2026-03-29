@@ -63,7 +63,7 @@ export const WorkspaceInviteModal = ({
 
     try {
       const data = await sendInviteEmailMutation(email);
-      
+
       if (data?.emailSent) {
         toast({
           title: "Invite sent!",
@@ -74,7 +74,9 @@ export const WorkspaceInviteModal = ({
         // Email service unavailable, show join code to share manually
         toast({
           title: "Email unavailable",
-          description: data?.message || `Share join code ${joinCode} with ${email} manually`,
+          description:
+            data?.message ||
+            `Share join code ${joinCode} with ${email} manually`,
           type: "default",
         });
       }
