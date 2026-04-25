@@ -1,5 +1,5 @@
-import crudRepository from "./crudRepository.js";
 import Conversation from "../schema/conversation.js";
+import crudRepository from "./crudRepository.js";
 
 const conversationRepository = {
   ...crudRepository(Conversation),

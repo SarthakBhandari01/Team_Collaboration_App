@@ -1,5 +1,5 @@
-import crudRepository from "./crudRepository.js";
 import DMMessage from "../schema/dmMessage.js";
+import crudRepository from "./crudRepository.js";
 
 const dmMessageRepository = {
   ...crudRepository(DMMessage),

@@ -1,11 +1,11 @@
 import express from "express";
 
 import {
-  deleteDMMessage,
-  getUserConversations,
   createOrGetConversation,
-  getConversationMessages,
+  deleteDMMessage,
   getConversationById,
+  getConversationMessages,
+  getUserConversations,
 } from "../../controllers/conversationController.js";
 import { isAuthenticated } from "../../middleware/authMiddleware.js";
 

@@ -1,9 +1,9 @@
 import { createDMMessageService } from "../services/dmMessageService.js";
 import {
-  NEW_DM_MESSAGE,
-  NEW_DM_MESSAGE_RECEIVED,
   JOIN_CONVERSATION,
   LEAVE_CONVERSATION,
+  NEW_DM_MESSAGE,
+  NEW_DM_MESSAGE_RECEIVED,
 } from "../utils/common/eventConstant.js";
 
 export default function dmMessageHandler(io, socket) {
@@ -12,7 +12,15 @@ export default function dmMessageHandler(io, socket) {
     try {
       const room = data.conversationId;
       console.log("DM data", data);
-      const messageResponse = await createDMMessageService(data);
+      const messageResponse = await createDMMessageService({
+        conversationId: data.conversationId,
+        body: data.body,
+        senderId: data.senderId,
+        workspaceId: data.workspaceId,
+        fileUrl: data.fileUrl || null,
+        fileType: data.fileType || null,
+        fileName: data.fileName || null,
+      });
       io.to(room).emit(NEW_DM_MESSAGE_RECEIVED, messageResponse);
       cb({
         success: true,

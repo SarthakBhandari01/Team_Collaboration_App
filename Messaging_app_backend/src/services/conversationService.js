@@ -1,9 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 
 import conversationRepository from "../repositories/conversationRepository.js";
+import workspaceRepository from "../repositories/workspaceRepository.js";
 import ClientError from "../utils/errors/clientError.js";
 import { isUserMemberOfWorkspace } from "./workspaceService.js";
-import workspaceRepository from "../repositories/workspaceRepository.js";
 
 export const getOrCreateConversationService = async (
   workspaceId,

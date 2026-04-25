@@ -44,7 +44,15 @@ export default function messageHandler(io, socket) {
     try {
       const room = data.channelId;
       console.log("data", data);
-      const messageResponse = await createMessageService(data);
+      const messageResponse = await createMessageService({
+        channelId: data.channelId,
+        body: data.body,
+        senderId: data.senderId,
+        workspaceId: data.workspaceId,
+        fileUrl: data.fileUrl || null,
+        fileType: data.fileType || null,
+        fileName: data.fileName || null,
+      });
       io.to(room).emit(NEW_MESSAGE_RECEIVED_EVENT, messageResponse);
 
       // Detect @mentions and create notifications

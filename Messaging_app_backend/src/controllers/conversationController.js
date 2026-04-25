@@ -1,9 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 
 import {
+  getConversationByIdService,
   getOrCreateConversationService,
   getUserConversationsService,
-  getConversationByIdService,
 } from "../services/conversationService.js";
 import {
   deleteDMMessageService,

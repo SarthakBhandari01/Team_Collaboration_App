@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 
-import dmMessageRepository from "../repositories/dmMessageRepository.js";
 import conversationRepository from "../repositories/conversationRepository.js";
+import dmMessageRepository from "../repositories/dmMessageRepository.js";
 import ClientError from "../utils/errors/clientError.js";
 
 export const createDMMessageService = async (data) => {

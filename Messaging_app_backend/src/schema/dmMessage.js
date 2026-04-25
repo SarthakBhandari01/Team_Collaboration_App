@@ -4,9 +4,19 @@ const dmMessageSchema = new mongoose.Schema(
   {
     body: {
       type: String,
-      required: [true, "Message body is required"],
+      default: "",
     },
     image: {
+      type: String,
+    },
+    fileUrl: {
+      type: String,
+    },
+    fileType: {
+      type: String,
+      enum: ["image", "video", "document"],
+    },
+    fileName: {
       type: String,
     },
     conversationId: {
