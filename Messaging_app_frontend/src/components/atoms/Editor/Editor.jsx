@@ -1,5 +1,6 @@
 import "quill/dist/quill.snow.css";
 
+import { Loader2, Paperclip } from "lucide-react";
 import Quill from "quill";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MdSend } from "react-icons/md";
@@ -9,7 +10,12 @@ import { Button } from "@/components/ui/button";
 
 import { Hint } from "../Hint/Hint";
 
-export const Editor = ({ onSubmit }) => {
+export const Editor = ({
+  onSubmit,
+  hasAttachment = false,
+  onAttachClick,
+  isUploading = false,
+}) => {
   const containerRef = useRef();
   const quillRef = useRef();
   const [isToolbarVisible, setIsToolbarVisible] = useState(true);
@@ -17,13 +23,13 @@ export const Editor = ({ onSubmit }) => {
 
   const handleSubmit = useCallback(() => {
     const text = quillRef.current?.getText()?.trim();
-    if (!text) return;
+    if (!text && !hasAttachment) return;
 
     const messageContent = JSON.stringify(quillRef.current?.getContents());
-    onSubmit({ body: messageContent });
+    onSubmit({ body: text ? messageContent : "" });
     quillRef.current?.setText("");
     setIsEmpty(true);
-  }, [onSubmit]);
+  }, [onSubmit, hasAttachment]);
 
   function toggleToolbar() {
     setIsToolbarVisible(!isToolbarVisible);
@@ -92,7 +98,7 @@ export const Editor = ({ onSubmit }) => {
     <div className="flex flex-col">
       <div className="flex flex-col border border-slate-500 rounded-md overflow-hidden  focus-within:shadow-sm focus-within:border-slate-400 bg-white">
         <div className="h-full" ref={containerRef} />
-        <div className="flex px-2 pb-2">
+        <div className="flex items-center gap-1 px-2 pb-2">
           <Hint label={!isToolbarVisible ? "Show Toolbar" : "Hide Toolbar"}>
             <Button
               variant="ghost"
@@ -103,11 +109,30 @@ export const Editor = ({ onSubmit }) => {
               <PiTextAa className="size-4" />
             </Button>
           </Hint>
-          <Hint label={"Send Message"}>
+
+          {/* Attachment button - inside toolbar */}
+          {onAttachClick && (
+            <Hint label="Attach file">
+              <Button
+                variant="ghost"
+                size="iconSm"
+                disabled={isUploading}
+                onClick={onAttachClick}
+              >
+                {isUploading ? (
+                  <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                ) : (
+                  <Paperclip className="size-4 text-muted-foreground" />
+                )}
+              </Button>
+            </Hint>
+          )}
+
+          <Hint label="Send Message">
             <Button
               size="iconSm"
               onClick={handleSubmit}
-              disabled={isEmpty}
+              disabled={(isEmpty && !hasAttachment) || isUploading}
               className="ml-auto bg-[#007a6a] hover:bg-[#007a6a]/80 text-white disabled:opacity-50"
             >
               <MdSend className="size-4" />

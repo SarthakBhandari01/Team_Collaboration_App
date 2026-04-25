@@ -146,6 +146,9 @@ export const DirectMessage = () => {
                   messageId={message._id}
                   authorId={message.senderId?._id}
                   body={message.body}
+                  fileUrl={message.fileUrl}
+                  fileType={message.fileType}
+                  fileName={message.fileName}
                   authorImage={message.senderId?.avatar}
                   authorName={message.senderId?.username}
                   createdAt={formatRelativeTime(message.createdAt)}
